@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Health Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-content h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        .header-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        .user-info {
+            text-align: right;
+        }
+        .user-info .username {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        .user-info .logout-btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        .user-info .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .card-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .card-action {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        .card-action:hover {
+            transform: translateY(-2px);
+        }
+        .chat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .chat-card::before {
+            background: rgba(255,255,255,0.3);
+        }
+        .chat-card .card-title,
+        .chat-card .card-description {
+            color: white;
+        }
+        .chat-card .card-action {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .chat-card .card-action:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+        .quick-actions {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .quick-actions h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e9ecef;
+            background: white;
+            color: #333;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .action-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        .notification-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .user-info {
+                text-align: center;
+                margin-top: 1rem;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div>
+                <h1>Health Dashboard</h1>
+                <p>Welcome back, {{ user.username }}! Manage your health and wellness.</p>
+            </div>
+            <div class="user-info">
+                {% if profile.profile_image %}
+                    <img src="{{ profile.profile_image.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid white; margin-bottom: 10px;">
+                {% else %}
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 24px;">👤</div>
+                {% endif %}
+                <div class="username">{{ user.get_full_name|default:user.username }}</div>
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Quick Stats -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">{{ upcoming_appointments_count }}</div>
+                <div class="stat-label">Upcoming Appointments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ medical_records_count }}</div>
+                <div class="stat-label">Medical Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ active_reminders_count }}</div>
+                <div class="stat-label">Active Reminders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ messages_count }}</div>
+                <div class="stat-label">Messages</div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Cards -->
+        <div class="dashboard-grid">
+            <!-- Chat Assistant Card -->
+            <div class="dashboard-card chat-card" onclick="window.location.href='{% url 'chat_interface' %}'">
+                {% if unread_count > 0 %}
+                    <div class="notification-badge">{{ unread_count }}</div>
+                {% endif %}
+                <span class="card-icon">AI</span>
+                <h2 class="card-title">Health Assistant</h2>
+                <p class="card-description">
+                    Chat with our AI health assistant for instant help with appointments, medications, and health questions.
+                </p>
+                <a href="{% url 'chat_interface' %}" class="card-action">Start Chat</a>
+            </div>
+
+            <!-- Appointments Card -->
+            <div class="dashboard-card" onclick="window.location.href='{% url 'book_appointment' %}'">
+                <span class="card-icon">Book</span>
+                <h2 class="card-title">Appointments</h2>
+                <p class="card-description">
+                    Schedule, view, and manage your medical appointments with healthcare providers.
+                </p>
+                <a href="{% url 'book_appointment' %}" class="card-action">Manage Appointments</a>
+            </div>
+
+            <!-- Medical Records Card -->
+            <div class="dashboard-card" onclick="window.location.href='{% url 'medical_records_list' %}'">
+                <span class="card-icon">Records</span>
+                <h2 class="card-title">Medical Records</h2>
+                <p class="card-description">
+                    Record and view your diagnosis, diseases, chronic conditions, medications, and medical history.
+                </p>
+                <a href="{% url 'medical_records_list' %}" class="card-action">Manage Records</a>
+            </div>
+
+            <!-- Profile Card -->
+            <div class="dashboard-card" onclick="window.location.href='{% url 'profile' %}'">
+                <span class="card-icon">Profile</span>
+                <h2 class="card-title">My Profile</h2>
+                <p class="card-description">
+                    Update your personal information, contact details, and health preferences.
+                </p>
+                <a href="{% url 'profile' %}" class="card-action">Edit Profile</a>
+            </div>
+
+            <!-- Notifications Card -->
+            <div class="dashboard-card" onclick="window.location.href='{% url 'notifications_' %}'">
+                <span class="card-icon">Notifications</span>
+                <h2 class="card-title">Notifications</h2>
+                <p class="card-description">
+                    Stay updated with appointment reminders, test results, and health alerts.
+                </p>
+                <a href="{% url 'notifications_' %}" class="card-action">View Notifications</a>
+            </div>
+
+            <!-- Emergency Contacts Card -->
+            <div class="dashboard-card" onclick="window.location.href='{% url 'emergency_contacts' %}'">
+                <span class="card-icon">📞</span>
+                <h2 class="card-title">Emergency Contacts</h2>
+                <p class="card-description">
+                    Store doctors, hospitals, and emergency numbers for quick access and one-tap dialing.
+                </p>
+                <a href="{% url 'emergency_contacts' %}" class="card-action">Manage Contacts</a>
+            </div>
+
+        </div>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+                <a href="{% url 'chat_interface' %}" class="action-btn">Chat with Assistant</a>
+                <a href="{% url 'book_appointment' %}" class="action-btn">Book Appointment</a>
+                <a href="{% url 'medical_records_list' %}" class="action-btn">Medical Records</a>
+                <a href="{% url 'profile' %}" class="action-btn">Update Profile</a>
+                <a href="{% url 'notifications_' %}" class="action-btn">Check Notifications</a>
+                <a href="{% url 'reminders' %}" class="action-btn">Manage Reminders</a>
+                <a href="{% url 'emergency_contacts' %}" class="action-btn">Emergency Contacts</a>
+                <a href="{% url 'register' %}" class="action-btn">Register New User</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stats on load
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const target = parseInt(stat.textContent);
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    stat.textContent = Math.floor(current);
+                }, 30);
+            });
+
+            // Add ripple effect to cards
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    const ripple = document.createElement('div');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255,255,255,0.5)';
+                    ripple.style.width = ripple.style.height = '40px';
+                    ripple.style.top = (e.clientY - card.offsetTop - 20) + 'px';
+                    ripple.style.left = (e.clientX - card.offsetLeft - 20) + 'px';
+                    ripple.style.animation = 'ripple 0.6s ease-out';
+                    card.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

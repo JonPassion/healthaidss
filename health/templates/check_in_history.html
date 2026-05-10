@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in History - Health Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+        }
+        .back-link:hover {
+            opacity: 1;
+        }
+        .content {
+            padding: 40px;
+        }
+        .history-list {
+            display: grid;
+            gap: 20px;
+        }
+        .history-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .history-card.completed {
+            border-left-color: #28a745;
+        }
+        .history-card.cancelled {
+            border-left-color: #dc3545;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .history-header h3 {
+            color: #333;
+            margin: 0;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-badge.active {
+            background: #ffc107;
+            color: #333;
+        }
+        .status-badge.completed {
+            background: #28a745;
+            color: white;
+        }
+        .status-badge.cancelled {
+            background: #dc3545;
+            color: white;
+        }
+        .history-field {
+            margin-bottom: 10px;
+        }
+        .history-field strong {
+            color: #667eea;
+        }
+        .history-field.completed strong {
+            color: #28a745;
+        }
+        .responses {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+            white-space: pre-wrap;
+        }
+        .history-date {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .header {
+                padding: 20px;
+                text-align: center;
+            }
+            .content {
+                padding: 20px;
+            }
+            .history-card {
+                padding: 15px;
+            }
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .history-field {
+                font-size: 14px;
+            }
+            .responses {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Check-in History</h1>
+            <p>Your past health check-ins</p>
+            <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+        </div>
+        
+        <div class="content">
+            {% if check_ins %}
+                <div class="history-list">
+                    {% for check_in in check_ins %}
+                        <div class="history-card {{ check_in.status }}">
+                            <div class="history-header">
+                                <h3>Check-in #{{ forloop.counter }}</h3>
+                                <span class="status-badge {{ check_in.status }}">{{ check_in.status }}</span>
+                            </div>
+                            <div class="history-field">
+                                <strong>Initial symptoms:</strong> {{ check_in.initial_symptoms }}
+                            </div>
+                            <div class="history-field">
+                                <strong>Check-ins performed:</strong> {{ check_in.check_in_count }}
+                            </div>
+                            {% if check_in.responses %}
+                                <div class="responses">
+                                    <strong>Your responses:</strong>
+                                    {{ check_in.responses }}
+                                </div>
+                            {% endif %}
+                            <div class="history-date">
+                                Started: {{ check_in.created_at|date:"F d, Y H:i" }}
+                                {% if check_in.completed_at %}
+                                    | Completed: {{ check_in.completed_at|date:"F d, Y H:i" }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h2>No Check-ins Yet</h2>
+                    <p>You haven't had any health check-ins yet. Check-ins are automatically started after symptom analysis.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

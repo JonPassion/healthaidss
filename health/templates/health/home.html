@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthAid - Symptom Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+        }
+        
+        .user-info-header .username {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .symptom-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        .symptom-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+            margin: 20px auto;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+        
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .result-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .result-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .symptoms-detected {
+            background: #e3f2fd;
+        }
+        
+        .predictions {
+            background: #fff3e0;
+        }
+        
+        .ai-response {
+            background: #f3e5f5;
+        }
+        
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .prediction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .confidence-bar {
+            width: 100px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-left: 15px;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            transition: width 0.3s;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #c62828;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .disclaimer {
+            background: #fff9c4;
+            color: #f57f17;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+            .header-left {
+                margin-bottom: 15px;
+            }
+            .header-right {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .symptom-input {
+                min-height: 100px;
+            }
+            .analyze-btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+            .prediction-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🏥 HealthAid</h1>
+                <p>AI-Powered Symptom Analysis</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info-header">
+                    {% if profile.profile_image %}
+                        <img src="{{ profile.profile_image.url }}" alt="Profile">
+                    {% else %}
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 24px;">👤</div>
+                    {% endif %}
+                    <div class="username">{{ user.get_full_name|default:user.username }}</div>
+                </div>
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <label for="symptoms">Describe your symptoms:</label>
+                <textarea 
+                    id="symptoms" 
+                    class="symptom-input" 
+                    placeholder="Example: I have a headache, fever, and sore throat. I've been feeling tired for the past two days..."
+                ></textarea>
+                <button id="analyzeBtn" class="analyze-btn">Analyze Symptoms</button>
+            </div>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing your symptoms...</p>
+            </div>
+            
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <div id="results" class="results">
+                <div id="symptomsSection" class="result-section symptoms-detected" style="display: none;">
+                    <h3>🔍 Symptoms Detected</h3>
+                    <div id="symptomsList"></div>
+                </div>
+                
+                <div id="predictionsSection" class="result-section predictions" style="display: none;">
+                    <h3>📊 Predictions</h3>
+                    <div id="predictionsList"></div>
+                </div>
+                
+                <div id="aiSection" class="result-section ai-response" style="display: none;">
+                    <h3>🤖 AI Medical Response</h3>
+                    <div id="aiResponse"></div>
+                </div>
+                
+                <div class="disclaimer">
+                    ⚠️ This is not a medical diagnosis. Always consult with a qualified healthcare professional for proper medical advice and treatment.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const symptomsInput = document.getElementById('symptoms');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const results = document.getElementById('results');
+        const symptomsSection = document.getElementById('symptomsSection');
+        const predictionsSection = document.getElementById('predictionsSection');
+        const aiSection = document.getElementById('aiSection');
+
+        analyzeBtn.addEventListener('click', analyzeSymptoms);
+        symptomsInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                analyzeSymptoms();
+            }
+        });
+
+        async function analyzeSymptoms() {
+            const symptoms = symptomsInput.value.trim();
+            
+            if (!symptoms) {
+                showError('Please describe your symptoms before analyzing.');
+                return;
+            }
+
+            setLoading(true);
+            hideError();
+            hideResults();
+
+            try {
+                const response = await fetch('/api/analyze/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ symptoms: symptoms })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'An error occurred during analysis.');
+                }
+            } catch (err) {
+                showError('Network error. Please check your connection and try again.');
+                console.error('Error:', err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function displayResults(data) {
+            // Display detected symptoms
+            if (data.mapped_symptoms && data.mapped_symptoms.length > 0) {
+                document.getElementById('symptomsList').innerHTML = 
+                    data.mapped_symptoms.map(symptom => 
+                        `<span style="display: inline-block; background: #2196f3; color: white; padding: 5px 12px; margin: 3px; border-radius: 20px; font-size: 14px;">${symptom}</span>`
+                    ).join('');
+                symptomsSection.style.display = 'block';
+            }
+
+            // Display predictions
+            if (data.predictions && data.predictions.length > 0) {
+                document.getElementById('predictionsList').innerHTML = 
+                    data.predictions.map(pred => {
+                        const confidence = pred.confidence * 100;
+                        let riskColor, riskLevel;
+                        if (confidence > 70) {
+                            riskColor = '#dc3545'; // Red - High risk
+                            riskLevel = 'High';
+                        } else if (confidence > 40) {
+                            riskColor = '#ffc107'; // Yellow - Medium risk
+                            riskLevel = 'Medium';
+                        } else {
+                            riskColor = '#28a745'; // Green - Low risk
+                            riskLevel = 'Low';
+                        }
+                        return `
+                        <div class="prediction-item" style="border-left: 4px solid ${riskColor};">
+                            <span><strong>${pred.disease}</strong></span>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center;">
+                                    <span style="margin-right: 10px;">${confidence.toFixed(1)}%</span>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" style="width: ${confidence}%; background-color: ${riskColor};"></div>
+                                    </div>
+                                </div>
+                                <span style="color: ${riskColor}; font-weight: 600; font-size: 0.9rem;">${riskLevel} Risk</span>
+                            </div>
+                        </div>
+                    `}).join('');
+                predictionsSection.style.display = 'block';
+            }
+
+            // Display AI response
+            if (data.ai_response) {
+                document.getElementById('aiResponse').innerHTML = 
+                    `<div style="white-space: pre-line; line-height: 1.6;">${data.ai_response}</div>`;
+                aiSection.style.display = 'block';
+            }
+
+            results.style.display = 'block';
+        }
+
+        function setLoading(isLoading) {
+            analyzeBtn.disabled = isLoading;
+            loading.style.display = isLoading ? 'block' : 'none';
+            if (isLoading) {
+                analyzeBtn.textContent = 'Analyzing...';
+            } else {
+                analyzeBtn.textContent = 'Analyze Symptoms';
+            }
+        }
+
+        function showError(message) {
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+
+        function hideError() {
+            error.style.display = 'none';
+        }
+
+        function hideResults() {
+            results.style.display = 'none';
+            symptomsSection.style.display = 'none';
+            predictionsSection.style.display = 'none';
+            aiSection.style.display = 'none';
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

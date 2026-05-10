@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Reminders - Health Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-content h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        .user-info {
+            text-align: right;
+        }
+        .user-info .username {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        .user-info .logout-btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        .user-info .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .form-card h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .reminders-list {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .reminders-list h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        .reminder-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .reminder-item.inactive {
+            opacity: 0.6;
+            border-left-color: #999;
+        }
+        .reminder-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .reminder-info p {
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        .reminder-meta {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .reminder-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+        .messages {
+            margin-bottom: 1.5rem;
+        }
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 1.5rem;
+            }
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .user-info {
+                text-align: center;
+                margin-top: 1rem;
+            }
+            .dashboard-container {
+                padding: 0 1rem;
+            }
+            .form-card, .reminders-list {
+                padding: 1.5rem;
+            }
+            .reminder-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .reminder-actions {
+                margin-top: 1rem;
+                width: 100%;
+            }
+            .reminder-actions a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1>Auto Reminders</h1>
+            <div class="user-info">
+                <div class="username">{{ user.username }}</div>
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-card">
+            <h2>Create New Reminder</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">Title</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.reminder_type.id_for_label }}">Reminder Type</label>
+                    {{ form.reminder_type }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.frequency.id_for_label }}">Frequency</label>
+                    {{ form.frequency }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.reminder_time.id_for_label }}">Time</label>
+                    {{ form.reminder_time }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.reminder_date.id_for_label }}">Date (required for 'once' reminders)</label>
+                    {{ form.reminder_date }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.is_active.id_for_label }}">Active</label>
+                    {{ form.is_active }}
+                </div>
+                <button type="submit" class="btn btn-primary">Create Reminder</button>
+            </form>
+        </div>
+
+        <div class="reminders-list">
+            <h2>Your Reminders</h2>
+            {% if reminders %}
+                {% for reminder in reminders %}
+                    <div class="reminder-item {% if not reminder.is_active %}inactive{% endif %}">
+                        <div class="reminder-info">
+                            <h3>{{ reminder.title }}</h3>
+                            <p><strong>Type:</strong> {{ reminder.get_reminder_type_display }}</p>
+                            <p><strong>Frequency:</strong> {{ reminder.get_frequency_display }}</p>
+                            <p><strong>Time:</strong> {{ reminder.reminder_time }}</p>
+                            {% if reminder.reminder_date %}
+                                <p><strong>Date:</strong> {{ reminder.reminder_date }}</p>
+                            {% endif %}
+                            {% if reminder.description %}
+                                <p><strong>Description:</strong> {{ reminder.description }}</p>
+                            {% endif %}
+                            <p class="reminder-meta">
+                                Next send: {{ reminder.next_send|date:"Y-m-d H:i" }}
+                                {% if reminder.last_sent %}
+                                    | Last sent: {{ reminder.last_sent|date:"Y-m-d H:i" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="reminder-actions">
+                            <a href="{% url 'toggle_reminder' reminder.id %}" class="btn btn-sm {% if reminder.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                {% if reminder.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </a>
+                            <a href="{% url 'delete_reminder' reminder.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>No reminders yet. Create your first reminder above!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
