@@ -30,7 +30,6 @@ def home(request):
         return redirect('dashboard')
     return redirect('login')
 
-@login_required
 def user_login(request):
     """Login view"""
     if request.user.is_authenticated:
