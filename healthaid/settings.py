@@ -36,13 +36,13 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-b9bj_vn6ntthme
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # Render.com specific configuration
-if 'onrender.com' in os.environ.get('ALLOWED_HOSTS', ''):
+if 'onrender.com' in os.environ.get('ALLOWED_HOSTS', '') or 'onrender.com' in os.environ.get('RENDER_SERVICE_URL', ''):
     ALLOWED_HOSTS = ['*.onrender.com', 'healthaidss.onrender.com', 'healthaid.onrender.com']
 else:
     ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Security settings for production
-if 'onrender.com' in os.environ.get('ALLOWED_HOSTS', ''):
+if 'onrender.com' in os.environ.get('ALLOWED_HOSTS', '') or 'onrender.com' in os.environ.get('RENDER_SERVICE_URL', ''):
     # Render.com specific settings
     SECURE_SSL_REDIRECT = False
     SECURE_HSTS_SECONDS = 31536000
