@@ -20,7 +20,7 @@ services:
       - key: ALLOWED_HOSTS
         value: "*.onrender.com,healthaidss.onrender.com,healthaid.onrender.com"
       - key: SECURE_SSL_REDIRECT
-        value: "True"
+        value: "False"
       - key: SECURE_HSTS_SECONDS
         value: "31536000"
       - key: SECURE_HSTS_INCLUDE_SUBDOMAINS
