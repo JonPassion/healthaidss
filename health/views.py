@@ -23,12 +23,11 @@ map_symptoms = None
 generate_medical_response = None
 MODEL_AVAILABLE = None
 
-@login_required
 def home(request):
-    """Home page - always redirect to login first"""
+    """Home page - show login page directly"""
     if request.user.is_authenticated:
         return redirect('dashboard')
-    return redirect('login')
+    return user_login(request)
 
 def user_login(request):
     """Login view"""
