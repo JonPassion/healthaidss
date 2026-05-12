@@ -28,9 +28,9 @@ services:
       - key: SECURE_HSTS_PRELOAD
         value: "True"
       - key: SESSION_COOKIE_SECURE
-        value: "True"
+        value: "False"
       - key: CSRF_COOKIE_SECURE
-        value: "True"
+        value: "False"
       - key: DATABASE_URL
         fromDatabase:
           name: healthaid_db
